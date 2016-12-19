@@ -79,7 +79,7 @@ class MUCBot(sleekxmpp.ClientXMPP):
 				if "check_process" in received_text_dict_check_request:
 					process = received_text_dict_check_request['check_process']
 					process_result = self.check_process(process)
-					return_msg_dict = {"check_result":{"check_id":received_text_dict_check_request['check_id'],
+					return_msg_dict = {"check_result:":{"check_id":received_text_dict_check_request['check_id'],
 										"process_result": process_result }}
 					msg.reply(json.dumps(return_msg_dict)).send()
 			#except:
@@ -121,7 +121,7 @@ class MUCBot(sleekxmpp.ClientXMPP):
 	def auto_message(self):
 		# this is the process that checks processes etc
 		if mod:
-			task_queue_file = "etc/task_queue.ini"
+			task_queue_file = "task_queue.ini"
 			with open(task_queue_file) as json_data:
 				d = json.load(json_data)
 			for key in d:

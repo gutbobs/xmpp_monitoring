@@ -323,7 +323,7 @@ class MUCBot(sleekxmpp.ClientXMPP):
 
 
 if __name__ == '__main__':
-    variables_file = "etc/database.ini"
+    variables_file = "etc/monitoring.ini"
     task_queue_file = "etc/task_queue.ini"
     # Setup the command line arguments.
     optp = OptionParser()
@@ -383,7 +383,7 @@ if __name__ == '__main__':
     xmpp.prepare_db_connection()
 
     xmpp_server_address = xmpp.external_vars['xmpp_server'].split(':')[0]
-    xmpp_server_port = xmpp.external_vars['xmpp_server'].split(':')[0]
+    xmpp_server_port = xmpp.external_vars['xmpp_server'].split(':')[1]
 
     # Connect to the XMPP server and start processing XMPP stanzas.
     if xmpp.connect((xmpp_server_address,xmpp_server_port)):
