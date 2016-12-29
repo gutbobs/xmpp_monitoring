@@ -9,9 +9,13 @@ import json
 import uuid
 import time
 import subprocess
+import os
 from optparse import OptionParser
 
-sys.path.append('modules')
+dir_path = os.path.dirname(os.path.realpath(__file__))
+module_path = os.path.join(dir_path,'modules')
+
+sys.path.append(module_path)
 from database import MySQLdb
 from load_variables import load_variables
 from ping_host import ping_host
@@ -219,7 +223,7 @@ class MUCBot(sleekxmpp.ClientXMPP):
 				d = json.load(json_data)
 			for key in d:
 				#print ("%s %s" % (key,d[key]))
-				print ("Host Alias: {host}".format(host=key))
+				#print ("Host Alias: {host}".format(host=key))
 				if "process_checks" in d[key]:
 					#print ("Process checks:")
 					for pc in d[key]['process_checks']:
@@ -352,8 +356,10 @@ class MUCBot(sleekxmpp.ClientXMPP):
 
 
 if __name__ == '__main__':
-    variables_file = "etc/monitoring.ini"
-    task_queue_file = "etc/task_queue.ini"
+
+    
+    variables_file = os.path.join(dir_path,"etc/monitoring.ini")
+    task_queue_file = os.path.join(dir_path,"etc/task_queue.ini")
     # Setup the command line arguments.
     optp = OptionParser()
 
