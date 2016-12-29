@@ -35,7 +35,7 @@ class MySQLdb:
 		self.connection.commit()
 
 	def Insert(self,query):
-		#print (query)
+		#pyprint (query)
 		self.Connect()
 		with self.connection.cursor() as cursor:
 			cursor.execute(query)
