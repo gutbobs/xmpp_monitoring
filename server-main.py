@@ -35,6 +35,7 @@ class MUCBot(sleekxmpp.ClientXMPP):
 		self.external_vars = {}
 		self.task_queue_file = ""
 		self.monitoring_account = ""
+		self.host_history = {}
 
 		self.add_event_handler("session_start", self.start)
 		self.add_event_handler("groupchat_message", self.muc_message)
@@ -78,7 +79,7 @@ class MUCBot(sleekxmpp.ClientXMPP):
 	def message(self, msg):
 		# we're expecing a dict
 		received_text=msg['body']
-		print (received_text)
+		#print (received_text)
 
 		received_text_dict=json.loads(str(received_text)) 
 
@@ -176,6 +177,13 @@ class MUCBot(sleekxmpp.ClientXMPP):
 				if "xmpp_nickname" in d[key]:
 					xmpp_nickname = d[key]['xmpp_nickname']
 					if host_name == xmpp_nickname.split('@')[0]:
+						if key not in self.host_history:
+							self.host_history[key]={'alert_after_failures':1,
+									'recent_history': [False],
+									'alert_open' : False
+									}
+						else:
+								self.host_history[key]['recent_history'].append(False)
 						self.host_status(host_name ,False)
 
 	def got_online(self,presence):
@@ -193,6 +201,13 @@ class MUCBot(sleekxmpp.ClientXMPP):
 				if "xmpp_nickname" in d[key]:
 					xmpp_nickname = d[key]['xmpp_nickname']
 					if host_name == xmpp_nickname.split('@')[0]:
+						if key not in self.host_history:
+							self.host_history[key]={'alert_after_failures': 1,
+									'recent_history': [True],
+									'alert_open' : False
+									}
+						else:
+							self.host_history[key]['recent_history'].append(True)
 						self.host_status(host_name ,True)
 
 
@@ -243,9 +258,18 @@ class MUCBot(sleekxmpp.ClientXMPP):
 					# update data base. check to see if host is in hosts table
 					#  if it isn't add it and then get the ID
 					#  if it is
+					if key not in self.host_history:
+						self.host_history[key]={'alert_after_failures': int(d[key]['alert_after_failures']),
+												'recent_history': [host_online],
+												'alert_open' : False
+												}
+					else:
+						self.host_history[key]['recent_history'].append(host_online)
+
 					self.host_status(key,host_online)
 
 	def host_status(self,host_name,host_online):
+		#print (self.host_history[host_name])
 		sqlquery = "select ID from Hosts where HOSTNAME = '{host_name}';".format(**locals())
 		result = self.db.Query(sqlquery)
 		if len(result) is 0:
@@ -280,13 +304,18 @@ class MUCBot(sleekxmpp.ClientXMPP):
 						sqlupdate = """update Host_State set CURRENTSTATE='{CURRENTSTATE}',LASTSTATE='{db_currentstate}',LASTSTATECHANGE=now()
 						 where HOSTID='{host_id}'""".format(**locals())
 						self.db.Update(sqlupdate)
-
-						### also send an alert to the monitoring account here
-						message = "Host: %s has changed state to: %s" % (host_name,CURRENTSTATE)
-						self.send_message(mto=self.monitoring_account,mbody=message,mtype='chat')
 				else:
 					sqlinsert = """insert into Host_State (HOSTID,CURRENTSTATE,LASTSTATE,LASTESTATECHANGE) 
 								values ('{host_id}','{CURRENTSTATE}','{CURRENTSTATE}',now());""".format(**locals())
+								### also send an alert to the monitoring account here
+				if 'alert_after_failures' not in self.host_history[host_name]: failures_before_alert = 1
+				else: failures_before_alert = self.host_history[host_name]['alert_after_failures']
+
+				if len(set(self.host_history[host_name]['recent_history'][ - failures_before_alert:])) == 1: # recent status checks have all had the same result.
+					if self.host_history[host_name]['alert_open'] == True:
+						message = "Host: %s is now ONLINE" % (host_name)
+						self.send_message(mto=self.monitoring_account,mbody=message,mtype='chat')
+						self.host_history[host_name]['alert_open'] = False
 		else:
 			CURRENTSTATE = 1
 			if not host_in_db:
@@ -306,19 +335,19 @@ class MUCBot(sleekxmpp.ClientXMPP):
 						 where HOSTID='{host_id}'""".format(**locals())
 						self.db.Update(sqlupdate)
 
-						### also send an alert to the monitoring account here
-						message = "Host: %s has changed state to: %s" % (host_name,CURRENTSTATE)
+				### also send an alert to the monitoring account here
+				if 'alert_after_failures' not in self.host_history[host_name]: failures_before_alert = 1
+				else: failures_before_alert = self.host_history[host_name]['alert_after_failures']
+				
+				print (host_name,failures_before_alert,self.host_history[host_name]['recent_history'])
+				print (self.host_history[host_name]['alert_after_failures'])
+				print (self.host_history[host_name]['recent_history'][-failures_before_alert:]) 
+
+				if len(set(self.host_history[host_name]['recent_history'][ - failures_before_alert:])) == 1: # recent status checks have all had the same result.
+					if self.host_history[host_name]['alert_open'] == False:
+						message = "Host: %s has gone OFFLINE" % (host_name)
 						self.send_message(mto=self.monitoring_account,mbody=message,mtype='chat')
-
-
-
-
-
-
-
-
-
-
+						self.host_history[host_name]['alert_open'] = True
 
 
 
