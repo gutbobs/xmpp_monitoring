@@ -212,6 +212,9 @@ class MUCBot(sleekxmpp.ClientXMPP):
 									}
 						else:
 							self.host_history[key]['recent_history'].append(True)
+							if len(self.host_history[key]['recent_history']) >= 100:
+                                                        	self.host_history[key]['recent_history'].pop(0)
+
 						self.host_status(host_name ,True)
 
 
@@ -269,6 +272,8 @@ class MUCBot(sleekxmpp.ClientXMPP):
 												}
 					else:
 						self.host_history[key]['recent_history'].append(host_online)
+						if len(self.host_history[key]['recent_history']) >= 100: 
+							self.host_history[key]['recent_history'].pop(0)
 
 					self.host_status(key,host_online)
 
@@ -343,9 +348,9 @@ class MUCBot(sleekxmpp.ClientXMPP):
 				if 'alert_after_failures' not in self.host_history[host_name]: failures_before_alert = 1
 				else: failures_before_alert = self.host_history[host_name]['alert_after_failures']
 				
-				print (host_name,failures_before_alert,self.host_history[host_name]['recent_history'])
-				print (self.host_history[host_name]['alert_after_failures'])
-				print (self.host_history[host_name]['recent_history'][-failures_before_alert:]) 
+				#print (host_name,failures_before_alert,self.host_history[host_name]['recent_history'])
+				#print (self.host_history[host_name]['alert_after_failures'])
+				#print (self.host_history[host_name]['recent_history'][-failures_before_alert:]) 
 
 				if len(set(self.host_history[host_name]['recent_history'][ - failures_before_alert:])) == 1: # recent status checks have all had the same result.
 					if self.host_history[host_name]['alert_open'] == False:
