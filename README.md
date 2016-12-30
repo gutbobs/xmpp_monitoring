@@ -22,13 +22,13 @@ Hosts and processes are checked in 1 of 2 ways:
 Host Monitoring
 ===============
 
-Hosts that capable of running the client-main.py code will join a chatroom. Membership of the chat room implies that the host is up. If the client leaves the chatroom (i.e. the script stops running) then an alert is raised
-Hosts that are not capable of running the client (or you don't have the necessary rights to make it run) are ping'ed every couple of seconds. If they do not respond in 2 seconds for x consuective tests then an alert is raised to show that they are down. x is equal to the variable defined by "alert_after_failures" in the task_queue.ini file
+Hosts that are capable of running the client-main.py code will join a chatroom. Membership of the chat room implies that the host is up. If the client leaves the chatroom (i.e. the script stops running) then an alert is raised
+Hosts that are not capable of running the client (or you don't have the necessary rights to make it run) are ping'ed every couple of seconds. If they do not respond in 2 seconds for x consecutive tests then an alert is raised to show that they are down. x is equal to the value defined by "alert_after_failures" in the task_queue.ini file
 
 Process Monitoring
 ==================
 
-Processes are monitored every couple of seconds (currently Linux only), by running the "ps aux" command and grep'ing the output to check that a particular process is runnnig. If the process isn't found an alert is raised. 
+Processes are monitored every couple of seconds (currently Linux only), by running the "ps aux" command, grep'ing the output and the checking the error code to check that a particular process is running. If the process isn't found an alert is raised. 
 
 Future plans
 ============
