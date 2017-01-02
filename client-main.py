@@ -50,12 +50,12 @@ class MUCBot(sleekxmpp.ClientXMPP):
 	def muc_message(self, msg):
 		# we're expecing a dict
 		received_text=msg['body']
-		print (received_text)
+		#print (received_text)
 		try:
 			received_text_dict=json.loads(str(received_text))            
 		except:
 			received_text_dict="bad"
-		print (received_text_dict)
+		#print (received_text_dict)
 
 	def check_process(self,process):
 		cmd = "ps aux | grep {process} | grep -v grep".format(**locals())
@@ -67,7 +67,7 @@ class MUCBot(sleekxmpp.ClientXMPP):
 	def message(self, msg):
 		# we're expecing a dict
 		received_text=msg['body']
-		print (received_text)
+		#print (received_text)
 
 		received_text_dict=json.loads(str(received_text)) 
 		if "check_request" in received_text_dict:
@@ -90,7 +90,7 @@ class MUCBot(sleekxmpp.ClientXMPP):
 
 	def muc_online(self, presence):
 		# add host to list of online hosts
-		print ("MUC online: %s " % presence['muc']['nick'])
+		#print ("MUC online: %s " % presence['muc']['nick'])
 		self.presence = presence
 		if mod:
 			message = "%s is MUC_ONLINE" % presence['muc']['nick']
@@ -98,21 +98,21 @@ class MUCBot(sleekxmpp.ClientXMPP):
 
 	def muc_offline(self,presence):
 		# mark host as offline
-		print ("MUC offline: %s" % presence['muc']['nick'])
+		#print ("MUC offline: %s" % presence['muc']['nick'])
 		self.presence = presence
 		if mod:
 			message = "%s is MUC_OFFLINE" % presence['muc']['nick']
 			self.send_message(mto="monitor@hill.lan",mbody=message,mtype='chat')
 
 	def got_offline(self,presence):
-		print ("got_offline: %s %s" % (presence['muc']['nick'],presence['muc']['role']) )
+		#print ("got_offline: %s %s" % (presence['muc']['nick'],presence['muc']['role']) )
 		self.presence = presence
 		if mod:
 			message = "%s is OFFLINE" % presence['muc']['nick']
 			self.send_message(mto="monitor@hill.lan",mbody=message,mtype='chat')
 
 	def got_online(self,presence):
-		print ("got_online: %s %s" % (presence['muc']['nick'],presence['muc']['role'])  ) 
+		#print ("got_online: %s %s" % (presence['muc']['nick'],presence['muc']['role'])  ) 
 		self.presence = presence  
 		if mod:
 			message = "%s is ONLINE" % presence['muc']['nick']
@@ -135,7 +135,7 @@ class MUCBot(sleekxmpp.ClientXMPP):
 											"msg_time": time.time(),
 											"check_id": check_id}}
 						message = json.dumps(send_check_dict)
-						print (message)
+						#print (message)
 						self.send_message(mto=d[key]['xmpp_nickname'],
 							mbody=message,
 							mtype='chat')
