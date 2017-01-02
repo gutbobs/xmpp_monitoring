@@ -35,7 +35,7 @@ class MUCBot(sleekxmpp.ClientXMPP):
 		self.add_event_handler("got_offline",self.got_offline)
 		self.add_event_handler("got_online",self.got_online)
 
-		self.schedule("auto send message",10,self.auto_message,repeat=True)
+		#self.schedule("auto send message",10,self.auto_message,repeat=True)
 
 
 	def start(self, event):
