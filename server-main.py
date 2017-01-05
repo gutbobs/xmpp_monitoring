@@ -156,6 +156,9 @@ class MUCBot(sleekxmpp.ClientXMPP):
 		print ("MUC online: %s " % presence['muc']['nick'])
 		self.presence = presence
 		if mod:
+			with open(self.task_queue_file) as json_data:
+				d = json.load(json_data)
+			if presence['muc']['nick'] in d:
 			message = "%s is MUC_ONLINE" % presence['muc']['nick']
 			self.send_message(mto=self.monitoring_account,mbody=message,mtype='chat')
 
@@ -164,8 +167,11 @@ class MUCBot(sleekxmpp.ClientXMPP):
 		print ("MUC offline: %s" % presence['muc']['nick'])
 		self.presence = presence
 		if mod:
-			message = "%s is MUC_OFFLINE" % presence['muc']['nick']
-			self.send_message(mto=self.monitoring_account,mbody=message,mtype='chat')
+			with open(self.task_queue_file) as json_data:
+				d = json.load(json_data)
+			if presence['muc']['nick'] in d:
+				message = "%s is MUC_OFFLINE" % presence['muc']['nick']
+				self.send_message(mto=self.monitoring_account,mbody=message,mtype='chat')
 
 	def got_offline(self,presence):
 		print ("got_offline: %s %s" % (presence['muc']['nick'],presence['muc']['role']) )
