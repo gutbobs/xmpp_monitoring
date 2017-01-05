@@ -159,8 +159,8 @@ class MUCBot(sleekxmpp.ClientXMPP):
 			with open(self.task_queue_file) as json_data:
 				d = json.load(json_data)
 			if presence['muc']['nick'] in d:
-			message = "%s is MUC_ONLINE" % presence['muc']['nick']
-			self.send_message(mto=self.monitoring_account,mbody=message,mtype='chat')
+				message = "%s is MUC_ONLINE" % presence['muc']['nick']
+				self.send_message(mto=self.monitoring_account,mbody=message,mtype='chat')
 
 	def muc_offline(self,presence):
 		# mark host as offline
