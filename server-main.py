@@ -85,7 +85,11 @@ class MUCBot(sleekxmpp.ClientXMPP):
 		received_text=msg['body']
 		#print (received_text)
 
-		received_text_dict=json.loads(str(received_text)) 
+		try:
+			received_text_dict=json.loads(str(received_text)) 
+		except:
+			print (received_text)
+			received_text_dict={}
 
 		if "check_result" in received_text_dict:
 			received_text_dict_check_result = received_text_dict['check_result']
@@ -305,6 +309,7 @@ class MUCBot(sleekxmpp.ClientXMPP):
 				self.db.Update(sqlupdate)
 				sqlinsert = """insert into Host_State (HOSTID,CURRENTSTATE,LASTSTATE,LASTSTATECHANGE)
 						VALUES ('{host_id}','{CURRENTSTATE}','0',now() )""".format(**locals())
+				print (sqlinsert)
 				self.db.Insert(sqlinsert)
 			else:
 				sqlupdate = "update Hosts set LASTSEEN=now() where ID='%s';" % host_id
@@ -320,9 +325,11 @@ class MUCBot(sleekxmpp.ClientXMPP):
 						 where HOSTID='{host_id}'""".format(**locals())
 						self.db.Update(sqlupdate)
 				else:
-					sqlinsert = """insert into Host_State (HOSTID,CURRENTSTATE,LASTSTATE,LASTESTATECHANGE) 
+					sqlinsert = """insert into Host_State (HOSTID,CURRENTSTATE,LASTSTATE,LASTSTATECHANGE) 
 								values ('{host_id}','{CURRENTSTATE}','{CURRENTSTATE}',now());""".format(**locals())
-								### also send an alert to the monitoring account here
+					print (sqlinsert)
+					self.db.Insert(sqlinsert)
+				### also send an alert to the monitoring account here
 				if 'alert_after_failures' not in self.host_history[host_name]: failures_before_alert = 1
 				else: failures_before_alert = self.host_history[host_name]['alert_after_failures']
 
@@ -350,6 +357,7 @@ class MUCBot(sleekxmpp.ClientXMPP):
 						 where HOSTID='{host_id}'""".format(**locals())
 						self.db.Update(sqlupdate)
 
+				
 				### also send an alert to the monitoring account here
 				if 'alert_after_failures' not in self.host_history[host_name]: failures_before_alert = 1
 				else: failures_before_alert = self.host_history[host_name]['alert_after_failures']
