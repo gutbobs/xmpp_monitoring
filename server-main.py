@@ -88,7 +88,7 @@ class MUCBot(sleekxmpp.ClientXMPP):
 		try:
 			received_text_dict=json.loads(str(received_text)) 
 		except:
-			print (received_text)
+			print ("issue with received text: ",received_text)
 			received_text_dict={}
 
 		if "check_result" in received_text_dict:
